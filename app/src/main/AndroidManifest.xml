@@ -13,13 +13,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-sdk
-        android:minSdkVersion="8"
-        android:targetSdkVersion="18" />
+        android:minSdkVersion="10"
+        android:targetSdkVersion="21" />
 
     <!-- add for new upgradation of google play services if required -->
 
     <application
-        android:name="com.builtio.builttwitterlogin.TwitterLoginApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"

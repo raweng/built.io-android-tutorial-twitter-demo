@@ -2,6 +2,7 @@ package com.builtio.builttwitterlogin;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -9,6 +10,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.raweng.built.Built;
+import com.raweng.built.BuiltApplication;
 import com.raweng.built.BuiltError;
 import com.raweng.built.BuiltUser;
 import com.raweng.built.userInterface.BuiltUILoginController;
@@ -29,14 +32,25 @@ import com.raweng.built.utilities.BuiltUtil;
  */
 public class TwitterLoginActivity extends BuiltUILoginController{
 
+    private BuiltApplication builtApplication;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		/*
+
+        /*
+         * Intialising built application
+         */
+
+        try {
+            builtApplication = Built.application(this ,"YOUR_APP_API_KEY");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        /*
 		 *  Checking user session is present on disc 
 		 */
-		if(BuiltUser.getSession() != null){
+		if(builtApplication.getCurrentUser() != null){
 			Intent detailIntent = new Intent(TwitterLoginActivity.this, UserDetails.class);
 			startActivity(detailIntent);
 			finish();
@@ -93,12 +107,6 @@ public class TwitterLoginActivity extends BuiltUILoginController{
 		/*
 		 * Saving user session is present on disc 
 		 */
-		try {
-			user.saveSession();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
 		Intent detailIntent = new Intent(TwitterLoginActivity.this, UserDetails.class);
 		startActivity(detailIntent);
 		finish();

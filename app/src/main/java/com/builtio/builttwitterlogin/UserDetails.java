@@ -10,10 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.raweng.built.Built;
+import com.raweng.built.BuiltApplication;
 import com.raweng.built.BuiltError;
 import com.raweng.built.BuiltResultCallBack;
 import com.raweng.built.BuiltUser;
 import com.raweng.built.androidquery.AQuery;
+import com.raweng.built.utilities.BuiltConstant;
 
 /**
  * This is built.io android tutorial.
@@ -32,8 +35,9 @@ public class UserDetails extends Activity {
 
 	private TextView screenNameTextView;
 	private ImageView profilePicImageView;
+    private BuiltApplication builtApplication;
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.detail_layout);
@@ -41,10 +45,19 @@ public class UserDetails extends Activity {
 		screenNameTextView   = (TextView) findViewById(R.id.userName);
 		profilePicImageView  = (ImageView) findViewById(R.id.profileImage);
 
+        /*
+         * Intialising built application
+         */
+
+        try {
+            builtApplication = Built.application(this, "YOUR_APP_API_KEY");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 		/*
 		 * Extracting the data from saved user.  
 		 */
-		JSONObject applicationUserJSON  = (JSONObject) BuiltUser.getSession().get("application_user");
+		JSONObject applicationUserJSON  = (JSONObject) builtApplication.getCurrentUser().get("application_user");
 		JSONObject authJSON     = applicationUserJSON.optJSONObject("auth_data");
 		JSONObject twitterJSON  = authJSON.optJSONObject("twitter");
 		JSONObject userInfoJSON = twitterJSON.optJSONObject("user_profile");
@@ -73,28 +86,20 @@ public class UserDetails extends Activity {
 			/*
 			 * logging out the user.
 			 */
-			BuiltUser.getSession().logout(new BuiltResultCallBack() {
+			builtApplication.getCurrentUser().logoutInBackground(new BuiltResultCallBack() {
 
-				@Override
-				public void onSuccess() {
-					/// after successfully success blog called.
-					Toast.makeText(UserDetails.this, "Logout successfully...", Toast.LENGTH_SHORT).show();
-					finish();
-				}
+                @Override
+                public void onCompletion(BuiltConstant.ResponseType responseType, BuiltError builtError) {
 
-				@Override
-				public void onError(BuiltError error) {
-					
-					///If any error occurred while logout this error object provides more details
-					Toast.makeText(UserDetails.this, "error :"+error.getErrorMessage(), Toast.LENGTH_SHORT).show();
-				}
+                    if(builtError == null){
+                        Toast.makeText(UserDetails.this, "Logout successfully...", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }else {
+                        Toast.makeText(UserDetails.this, "error :" + builtError.getErrorMessage(), Toast.LENGTH_SHORT).show();
+                    }
 
-				@Override
-				public void onAlways() {
-					// write code here that you want to execute
-				    // regardless of success or failure of the operation
-				}
-			});
+                }
+            });
 
 
 			return true;
